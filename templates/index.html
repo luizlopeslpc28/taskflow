@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow — Gerenciador de Tarefas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+          <span class="logo-text">TaskFlow</span>
+        </div>
+        <button class="btn-icon" id="btn-toggle-theme" aria-label="Alternar tema" title="Alternar tema">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Workspaces</div>
+        <button class="btn-create-workspace" id="btn-create-workspace">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>Novo workspace</span>
+        </button>
+        <nav class="workspace-list" id="workspace-list"></nav>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-info" title="{{ user_email }}">
+          <span class="user-email">{{ user_email }}</span>
+        </div>
+        <button class="btn-secondary btn-logout" id="btn-logout" type="button">
+          Sair
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-illustration">
+          <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="20" y="28" width="80" height="64" rx="6"/>
+            <path d="M20 44h80"/>
+            <circle cx="36" cy="36" r="3"/>
+            <circle cx="50" cy="36" r="3"/>
+            <circle cx="64" cy="36" r="3"/>
+            <rect x="36" y="56" width="48" height="6" rx="2"/>
+            <rect x="36" y="70" width="32" height="6" rx="2"/>
+          </svg>
+        </div>
+        <h2>Nenhum workspace selecionado</h2>
+        <p>Crie um workspace ou selecione um existente para começar a organizar suas tarefas.</p>
+        <button class="btn-primary" id="btn-empty-create">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Criar workspace
+        </button>
+      </div>
+
+      <div class="workspace-view hidden" id="workspace-view">
+        <header class="workspace-header">
+          <div class="workspace-title-group">
+            <h1 id="workspace-title">Workspace</h1>
+            <span class="task-count" id="task-count">0 tarefas</span>
+          </div>
+          <div class="workspace-actions">
+            <button class="btn-secondary" id="btn-edit-workspace" title="Editar workspace">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Editar
+            </button>
+            <button class="btn-danger-outline" id="btn-delete-workspace" title="Excluir workspace">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+              Excluir
+            </button>
+            <button class="btn-primary" id="btn-add-task">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Nova tarefa
+            </button>
+          </div>
+        </header>
+
+        <div class="kanban" id="kanban">
+          <div class="kanban-column" data-status="pendente">
+            <div class="column-header">
+              <div class="column-title">
+                <span class="status-dot status-pendente"></span>
+                <h3>Pendente</h3>
+                <span class="column-count" id="count-pendente">0</span>
+              </div>
+            </div>
+            <div class="column-body" data-status="pendente"></div>
+          </div>
+
+          <div class="kanban-column" data-status="em_producao">
+            <div class="column-header">
+              <div class="column-title">
+                <span class="status-dot status-em-producao"></span>
+                <h3>Em produção</h3>
+                <span class="column-count" id="count-em_producao">0</span>
+              </div>
+            </div>
+            <div class="column-body" data-status="em_producao"></div>
+          </div>
+
+          <div class="kanban-column" data-status="finalizado">
+            <div class="column-header">
+              <div class="column-title">
+                <span class="status-dot status-finalizado"></span>
+                <h3>Finalizado</h3>
+                <span class="column-count" id="count-finalizado">0</span>
+              </div>
+            </div>
+            <div class="column-body" data-status="finalizado"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Workspace -->
+  <div class="modal-overlay hidden" id="modal-workspace">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-workspace-title">Novo workspace</h2>
+        <button class="btn-icon modal-close" data-close="modal-workspace" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <form id="form-workspace">
+        <div class="form-group">
+          <label for="workspace-name">Nome do workspace</label>
+          <input type="text" id="workspace-name" placeholder="Ex: Projeto Pessoal" required maxlength="60" autocomplete="off">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close="modal-workspace">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-save-workspace">Criar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Task -->
+  <div class="modal-overlay hidden" id="modal-task">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-task-title">Nova tarefa</h2>
+        <button class="btn-icon modal-close" data-close="modal-task" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <form id="form-task">
+        <div class="form-group">
+          <label for="task-title">Título</label>
+          <input type="text" id="task-title" placeholder="O que precisa ser feito?" required maxlength="120" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="task-description">Descrição <span class="optional">(opcional)</span></label>
+          <textarea id="task-description" placeholder="Detalhes adicionais..." rows="4" maxlength="500"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="task-status">Status inicial</label>
+          <select id="task-status">
+            <option value="pendente">Pendente</option>
+            <option value="em_producao">Em produção</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close="modal-task">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-save-task">Criar tarefa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Confirm -->
+  <div class="modal-overlay hidden" id="modal-confirm">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 id="confirm-title">Confirmar exclusão</h2>
+        <button class="btn-icon modal-close" data-close="modal-confirm" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <p class="confirm-message" id="confirm-message">Tem certeza que deseja excluir?</p>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" data-close="modal-confirm">Cancelar</button>
+        <button type="button" class="btn-danger" id="btn-confirm-delete">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

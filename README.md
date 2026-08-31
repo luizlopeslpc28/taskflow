@@ -354,10 +354,7 @@ MIT — uso livre para estudo, portfólio e adaptações.
 
 **Luiz** — desenvolvedor em formação / portfólio.
 
-- GitHub: [https://github.com/SEU_USUARIO](https://github.com/SEU_USUARIO)  
-- LinkedIn: *(opcional)*  
-
-> Substitua `SEU_USUARIO`, links e a seção Autor pelos seus dados reais.
+- GitHub: [https://github.com/SEU_USUARIO](https://github.com/luizlopeslpc28)  
 
 ---
 
